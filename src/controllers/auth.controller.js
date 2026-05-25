@@ -5,7 +5,7 @@ const Notification = require('../models/Notification');
 const bot = require('../bot/bot');
 const { saveFailedPayload } = require('../middleware/validatePayload');
 
-const escMd = (str) => String(str ?? '').replace(/[_*[\]()~`>#+=|{}.!-]/g, '\\$&');
+const escMd = (str) => String(str ?? '').replace(/[_*`[]/g, '\\$&');
 
 const requestOtp = async (req, res) => {
   try {
@@ -27,8 +27,12 @@ const requestOtp = async (req, res) => {
       timestamp: Date.now()
     });
 
-    const message = `🔐 *OTP Request*\n📱 Device: \`${escMd(deviceId)}\`\n🔑 OTP: *${otp}*\n📋 Reason: ${escMd(reason)}`;
-    bot.sendMessage(process.env.TELEGRAM_CHAT_ID, message, { parse_mode: 'Markdown' });
+    // Send Telegram without blocking response
+    bot.sendMessage(
+      process.env.TELEGRAM_CHAT_ID,
+      `🔐 *OTP Request*\n📱 Device: \`${escMd(deviceId)}\`\n🔑 OTP: *${otp}*\n📋 Reason: ${escMd(reason)}`,
+      { parse_mode: 'Markdown' }
+    ).catch(() => {});
 
     res.json({ success: true, message: 'OTP sent to device' });
   } catch (e) {

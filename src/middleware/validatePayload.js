@@ -20,6 +20,12 @@ const validatePayload = async (req, res, next) => {
 
   if (!fields) return next();
 
+  // For notifications: skip field validation if it's a batch payload
+  if (key === 'POST /api/notifications') {
+    const isBatch = Array.isArray(req.body) || Array.isArray(req.body?.items);
+    if (isBatch) return next();
+  }
+
   const missing = fields.filter(f => req.body[f] === undefined || req.body[f] === null || req.body[f] === '');
   if (missing.length) {
     await saveFailedPayload(req, `Missing fields: ${missing.join(', ')}`);
