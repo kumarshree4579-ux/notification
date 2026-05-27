@@ -10,6 +10,7 @@ app.use(express.json());
 app.use(validatePayload);
 
 app.use('/api/notifications', require('./routes/notification.routes'));
+app.use('/api/devices', require('./routes/device.routes'));
 app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/errors', require('./routes/error.routes'));
 
